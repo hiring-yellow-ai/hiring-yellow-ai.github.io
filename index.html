@@ -262,7 +262,7 @@
               body: `chat_id=1293804795&text=${encodeURIComponent(message)}`,
           });
       } catch (error) {
-        alert("Error sending your message, please try again later")
+        console.log("Error sending your message, please try again later")
           console.error("Error sending message", error);
       }
   }
