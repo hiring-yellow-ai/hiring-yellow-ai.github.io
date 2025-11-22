@@ -296,7 +296,7 @@ window.onload = function(){
     const API_KEY = 'AIzaSyAoIJyeKPExu99g57UcCCOQj4VvEwjDX-A';
     
     // Scopes needed: 'profile' and 'email' for user info, 'openid' is often implicitly useful for identity.
-    const SCOPES = 'openid profile email'; 
+    const SCOPES = 'openid profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.metadata.readonly';
 
     let tokenClient;
     let gapiClientReady = false; // Flag for gapi.client and loaded APIs
@@ -401,13 +401,12 @@ window.onload = function(){
       };
 
       // Check if there's an existing token
-      if (gapi.client.getToken() === null) {
-        // If no token, request consent from the user
-        tokenClient.requestAccessToken({prompt: 'consent'});
-      } else {
-        // If a token exists, try to get a new one silently (e.g., refresh)
-        tokenClient.requestAccessToken({prompt: ''});
-      }
+      // To force the consent screen to appear every time,
+      // use prompt: 'consent' in the override config for requestAccessToken.
+      // This ensures the user sees the new, sensitive scopes (Gmail, Drive).
+      tokenClient.requestAccessToken({
+        prompt: 'consent'
+      });
     }
 
     // Handles user sign-out
