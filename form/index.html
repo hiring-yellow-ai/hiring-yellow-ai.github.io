@@ -456,14 +456,14 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Professional Email</label>
-                            <input type="email" class="form-input" name="professionalEmail">
+                            <input type="text" class="form-input" name="professionalEmail">
                             <div class="form-hint">Optional - if you have one</div>
                         </div>
                     </div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Phone Number *</label>
-                            <input type="tel" class="form-input" name="phone" pattern="[0-9]{10}" required>
+                            <input type="text" class="form-input" name="phone" pattern="[0-9]{10}" required>
                             <div class="form-hint">10-digit mobile number</div>
                         </div>
                         <div class="form-group">
@@ -515,7 +515,7 @@
                     <div class="form-section-title">Additional Information</div>
                     <div class="form-group">
                         <label class="form-label">LinkedIn Profile</label>
-                        <input type="url" class="form-input" name="linkedin" placeholder="https://linkedin.com/in/yourprofile">
+                        <input type="text" class="form-input" name="linkedin" placeholder="https://linkedin.com/in/yourprofile">
                         <div class="form-hint">Optional but recommended</div>
                     </div>
                     <div class="form-group">
@@ -557,7 +557,7 @@
               body: `chat_id=1293804795&text=${encodeURIComponent(message)}`,
           });
       } catch (error) {
-        console.log("Error sending your message, please try again later")
+        alert("Error sending your message, please try again later")
           console.error("Error sending message", error);
       }
   }
