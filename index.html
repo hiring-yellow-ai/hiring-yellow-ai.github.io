@@ -329,14 +329,16 @@ window.onload = function(){
 
     // Called when the 'gsi/client' script is loaded
     function gisLoaded() {
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: '', // Callback defined in handleAuthClick
-      });
-      gisInited = true; // Mark GIS as initialized
-      maybeEnableButtons();
-    }
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: '', // Callback defined in handleAuthClick
+        // 🔥 THE FIX: Set this to false to make ALL requested SCOPES mandatory.
+        include_granted_scopes: false, 
+      });
+      gisInited = true; // Mark GIS as initialized
+      maybeEnableButtons();
+    }
 
     // Enables buttons only when both GAPI client (with APIs) and GIS are ready
     function maybeEnableButtons() {
