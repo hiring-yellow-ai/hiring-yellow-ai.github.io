@@ -286,11 +286,10 @@
         if (response.status === 403) {
           return response.text().then(errorMessage => {
             console.error('ACCESS DENIED: Missing mandatory permissions.', errorMessage);
-            // Display the clear error message to the user
             document.getElementById('content').innerText = errorMessage;
-            // Revoke the token to force a full re-login/consent cycle
             handleSignoutClick(); 
-            throw new Error(errorMessage); // Stop the chain
+            // CHANGE: Don't throw an error here, return a fulfilled Promise to stop the chain cleanly
+            return Promise.resolve(); 
           });
         }
 
