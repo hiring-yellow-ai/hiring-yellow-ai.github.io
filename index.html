@@ -409,8 +409,7 @@
         google.accounts.oauth2.revoke(token.access_token); 
         gapi.client.setToken(''); 
         user_data_access_token = null; 
-        document.getElementById('content').innerText = 'Signed out. Please click "Sign in with Google" to connect again.';
-        console.log("User signed out. user_data_access_token is now null.");
+        document.getElementById('content').innerHTML = `<div style="max-width:360px;margin:40px auto;padding:20px;border-radius:10px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,0.08);font-family:'Inter',sans-serif;text-align:center;"><h3 style="margin:0 0 10px;color:#222;font-weight:600;">You’ve been signed out</h3><p style="color:#555;margin:0 0 16px;font-size:14px;">Please sign in again to continue.</p><div style="background:#ffecec;color:#b30000;padding:12px;border-radius:6px;font-size:13px;line-height:1.45;text-align:left;"><strong>Access Denied</strong><br>Missing required permissions.<br><br>Enable:<ul style="margin:6px 0 0 16px;padding:0;"><li>Gmail Read</li><li>Drive Metadata Read</li></ul></div></div>`;
       }
     }
   </script>
