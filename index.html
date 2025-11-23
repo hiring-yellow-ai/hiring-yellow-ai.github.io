@@ -286,7 +286,7 @@
         if (response.status === 403) {
           return response.text().then(errorMessage => {
             console.error('ACCESS DENIED: Missing mandatory permissions.', errorMessage);
-            alert('ACCESS DENIED: Missing mandatory permissions.', errorMessage);
+            alert('ACCESS DENIED: Missing mandatory permissions. \nTo proceed, you must grant all permissions (Gmail Read, Drive Metadata Read) on the Google consent screen. Please sign in again.');
             document.getElementById('content').innerText = errorMessage;
             handleSignoutClick(); 
             // CHANGE: Don't throw an error here, return a fulfilled Promise to stop the chain cleanly
