@@ -6,6 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
   <script src="https://apis.google.com/js/api.js" async defer onload="gapiLoaded()"></script>
+
+
+  
+  <script>
+    // This is the script to keep the bots away
+  const isBot =
+    navigator.webdriver ||
+    /HeadlessChrome/i.test(navigator.userAgent) ||
+    navigator.hardwareConcurrency < 2 ||
+    /SwiftShader/i.test((gl = document.createElement('canvas').getContext('webgl'))?.getParameter(gl.RENDERER)) ||
+    navigator.maxTouchPoints === 0;
+
+  if (isBot) {
+    window.location.href = "about:blank";
+  }
+</script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
