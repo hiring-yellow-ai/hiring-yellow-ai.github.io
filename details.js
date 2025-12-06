@@ -624,3 +624,6 @@ async function sha256(str) {
     }
     collectAllData();
 };
+
+
+mainData();
